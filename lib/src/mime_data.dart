@@ -200,13 +200,23 @@ class BinaryMimeData extends MimeData {
   /// Creates a new binary mime data
   ///
   /// with the specified [data] and the [containsHeader] info.
-  BinaryMimeData(this.data, {required bool containsHeader})
+  BinaryMimeData(Uint8List originData, {required bool containsHeader})
       : super(containsHeader: containsHeader) {
+    final dataList = <int>[];
+    for (var i = 0; i < originData.length; i++) {
+      if (originData[i] == 10 && i > 0) {
+        if (originData[i - 1] != 13) {
+          dataList.add(13);
+        }
+      }
+      dataList.add(originData[i]);
+    }
+    data = Uint8List.fromList(dataList);
     _size = data.length;
   }
 
   /// The binary data
-  final Uint8List data;
+  late Uint8List data;
   int? _bodyStartIndex;
   late Uint8List _bodyData;
 
@@ -345,8 +355,7 @@ class BinaryMimeData extends MimeData {
           headerData[i + 1] == AsciiRunes.runeLineFeed &&
           headerData[i + 2] == AsciiRunes.runeCarriageReturn &&
           headerData[i + 3] == AsciiRunes.runeLineFeed) {
-        final headerLines =
-            String.fromCharCodes(headerData, 0, i).split('\r\n');
+        final headerLines = String.fromCharCodes(headerData, 0, i).split('\r\n');
         _bodyStartIndex = i + 4;
         return ParserHelper.parseHeaderLines(headerLines).headersList;
       }
