@@ -342,8 +342,13 @@ abstract class MailCodec {
 
   /// Is a noop
   static String decodeOnlyCodec(String part, convert.Encoding codec,
-          {bool isHeader = false}) =>
-      part;
+          {bool isHeader = false}){
+      if(codec.name=='utf-8'){
+        return part;
+      }else{
+        return codec.decode(part.codeUnits);
+      }
+  }
 
   /// Wraps the text so that it stays within email's 76 characters
   /// per line convention.
