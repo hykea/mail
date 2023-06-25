@@ -110,7 +110,11 @@ class ParserHelper {
   /// Parses the headers from the given [headerText]
   static HeaderParseResult parseHeader(final String headerText) {
     final headerLines = headerText.split('\r\n');
-    return parseHeaderLines(headerLines);
+    final headerLinesSuper = <String>[];
+    for (final line in headerLines) {
+      headerLinesSuper.addAll(line.split('\n'));
+    }
+    return parseHeaderLines(headerLinesSuper);
   }
 
   /// Parses the headers from the given [headerLines]
